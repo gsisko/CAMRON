@@ -29,7 +29,7 @@ float RobotState::ForceSense(); //these funcitions try to attain the goal force 
 	
 	float ScrewOut = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
 	//adjust ScrewSpeed, make sure value is bounded in the future
-	ScrewSpeed = max(0, min(ScewOut, 255); 
+	ScrewSpeed = max(0, min(ScewOut, 255)); 
 	return sumnation[sumposition]
 }
 
