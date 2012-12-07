@@ -18,7 +18,7 @@ PIDControl<T>::PIDControl(T* _input, T* _output, T _P,T _I,T _D, T _desired)
 
 
 template <class T>
-void PIDControl<T>::operate()
+T PIDControl<T>::operate()
 {
 	sumposition += 1;
 	if(sumposition > SUM_SIZE)
@@ -28,6 +28,6 @@ void PIDControl<T>::operate()
 	sum = sumnation[sumposition];
 	sum -= sumnation[((sumposition+1) < SUM_SIZE)? (sumposition+1) : 0];
 
-	*output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
+	return *output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
 
 }
