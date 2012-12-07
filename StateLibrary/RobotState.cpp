@@ -1,6 +1,38 @@
 #include RobotState.h
 
 
+float* RobotState::checkErase()
+{
+  Serial.print((int)controller->checkLoc());
+  Serial.print("      ");
+  return &EraserForce;
+  
+}
+//P is initially .42 because this is the estimated 1 to 1 mapping of the input to the output across their respect ranges
+//this estimation is based on that we are mapping 60% of the range of a 10 bit value to an 8 bit value.
+RobotState::RobotState(){}
+void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, float _D = 0, float _desired = 1)
+{
+	PosX = initialX;
+	PosY = initialY;
+	SpeedX = 0;
+	SpeedY = 0;
+	GoalPositionX = 0;
+	GoalPositionY = 0;
+	controller = new PIDControl<float>( _P, _I, _D, _desired);
+        //Serial.println((int)&EraserForce);
+	/*GoalForce = 0;
+	  P = 0; 
+	  I = 0; 
+	  D = 0;
+	  for(int i=0; i<SUM_SIZE;i++)
+	  {
+	  sumnation[i] = 0;
+	  }
+	  sumposition = 0;
+	 */
+}
+
 float RobotState::ForceSense() //these funcitions try to attain the goal force and position of the robot, returns error
 {
         EraserForce = (float)analogRead(0);
