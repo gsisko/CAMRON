@@ -14,19 +14,22 @@ private:
 
   //Erasing Variables
   float EraserForce;	//force on the Eracser, in newtons
-  char ScrewSpeed;
+  float ScrewSpeed;
   //PID Variables, should really make a PID class
-  float sum;
+  //PID class instead!
+  PIDControl<float> *controller;
+  /*float sum;
   float diff;
   float sumnation[SUM_SIZE-1];
   int sumposition;
+   */
   //There might need to be varibles here that are PID related, however they will probably be static variables in the PID function
 public:
   RobotState(int, int); //takes the initial position
   void UpdateX(int); //adds buffered Encoder ticks into current position
   void UpdateY(int);
-  float GoalForce; //we want the eraser to have, each side of the eraser should be at half this force
-  float P,I,D;
+  /*float GoalForce; //we want the eraser to have, each side of the eraser should be at half this force
+  float P,I,D;*/
   int GoalPositionX, GoalPositionY;
   float ForceSense(); //these funcitions try to attain the goal force and position of the robot, returns error
   int Move(); 
