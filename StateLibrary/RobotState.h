@@ -25,7 +25,7 @@ private:
    */
   //There might need to be varibles here that are PID related, however they will probably be static variables in the PID function
 public:
-  RobotState(int, int); //takes the initial position
+  RobotState(int, int, float, float, float, float); //takes the initial position
   void UpdateX(int); //adds buffered Encoder ticks into current position
   void UpdateY(int);
   /*float GoalForce; //we want the eraser to have, each side of the eraser should be at half this force
