@@ -34,6 +34,11 @@ public:
   float ForceSense(); //these funcitions try to attain the goal force and position of the robot, returns error
   int Move(); 
 
+  void setPID(float, float, float, float);
+  void setP(float);
+  void setI(float);
+  void setD(float);
+  void setDES(float);
 
 
 };
