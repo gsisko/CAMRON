@@ -16,7 +16,7 @@ class  PIDControl
 		T desired;
 		float P,I,D;
 		PIDControl(T*, T*, T,T,T, T);
-		void operate();
+		T operate();
 };
 
 
