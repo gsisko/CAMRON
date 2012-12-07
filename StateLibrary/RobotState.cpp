@@ -36,7 +36,7 @@ void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, 
 float RobotState::ForceSense() //these funcitions try to attain the goal force and position of the robot, returns error
 {
         EraserForce = (float)analogRead(0);
-        return controller->operate(&EraserForce, &ScrewSpeed);
+        controller->operate(&EraserForce, &ScrewSpeed);
 	/*
 	   sumposition += 1;
 	   if(sumposition > SUM_SIZE)
