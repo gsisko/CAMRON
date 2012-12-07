@@ -43,3 +43,19 @@ float RobotState::ForceSense() //these funcitions try to attain the goal force a
   ScrewSpeed = max(0, min(ScrewSpeed, 255)); 
   return ScrewSpeed;
 }
+void RobotState::setPID(float _P, float _I, float _D, float _desired)
+{
+  controller->P = _P;
+  controller->I = _I;
+  controller->D = _D;
+  controller->desired = _desired;
+}
+
+void RobotState::setP(float _P)
+{controller->P = _P;}
+void RobotState::setI(float _I)
+{controller->I = _I;}
+void RobotState::setD(float _D)
+{controller->D = _D;}
+void RobotState::setDES(float _desired)
+{controller->desired = _desired;}
