@@ -1,3 +1,5 @@
+#include "PID.h"
+
 template <class T>
 PIDControl<T>::PIDControl(T* _input, T* _output, T _P,T _I,T _D, T _desired)
 {
