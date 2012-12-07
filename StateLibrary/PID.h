@@ -9,7 +9,7 @@ class  PIDControl
 		//PID Variables, should really make a PID class
 		T sum;
 		T diff;
-		T sumnation[SUM_SIZE-1];
+		T sumnation[SUM_SIZE];
 		int sumposition;
 
 	public:
