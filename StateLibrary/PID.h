@@ -6,15 +6,15 @@ class  PIDControl
 {
 	private:
 		//PID Variables, should really make a PID class
-		float sum;
-		float diff;
-		float sumnation[SUM_SIZE-1];
+		T sum;
+		T diff;
+		T sumnation[SUM_SIZE-1];
 		int sumposition;
 
 	public:
 		T* input, output;
 		T desired;
-		float P,I,D;
+		T P,I,D;
 		PIDControl(T*, T*, T,T,T, T);
 		T operate();
 };
