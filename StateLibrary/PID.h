@@ -1,6 +1,7 @@
 #ifndef ___PID___
 #define ___PID___
 
+
 template <class T>
 class  PIDControl
 {
@@ -12,11 +13,12 @@ class  PIDControl
 		int sumposition;
 
 	public:
-		T* input, output;
+		T *output;
 		T desired;
 		T P,I,D;
-		PIDControl(T*, T*, T,T,T, T);
-		T operate();
+                PIDControl(T,T,T, T);
+		T operate(T*, T*);
+                T* checkLoc();
 };
 
 
