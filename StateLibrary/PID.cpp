@@ -1,4 +1,5 @@
-PIDControl::PIDControl(T* _input, T* _output, T _P,T _I,T _D, T _desired)
+template <class T>
+PIDControl<T>::PIDControl(T* _input, T* _output, T _P,T _I,T _D, T _desired)
 {
 	input = _input;
 	output = _output;
@@ -14,8 +15,8 @@ PIDControl::PIDControl(T* _input, T* _output, T _P,T _I,T _D, T _desired)
 }
 
 
-
-void PIDControl::operate()
+template <class T>
+void PIDControl<T>::operate()
 {
 	sumposition += 1;
 	if(sumposition > SUM_SIZE)
