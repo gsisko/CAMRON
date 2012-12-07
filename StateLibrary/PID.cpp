@@ -28,6 +28,6 @@ void PIDControl<T>::operate()
 	sum = sumnation[sumposition];
 	sum -= sumnation[((sumposition+1) < SUM_SIZE)? (sumposition+1) : 0];
 
-	T *output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
+	*output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
 
 }
