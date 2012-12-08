@@ -1,7 +1,16 @@
-//#include "PID.h"
 
-#define SUM_SIZE 10
+#include <Servo.h>
+//#include "PID.h"
+#define POT 0
+#define LIFTMOTOR 7
+#define TOPLIMIT 31
+#define BOTTOMLIMIT 32
+#define SerialD Serial
+#define SUM_SIZE 50 
 #include <arduino.h>
+
+
+
 template <class T>
 class  PIDControl
 {
@@ -64,6 +73,7 @@ public:
   void setD(float);
   void setDES(float);
   float* checkErase();
+  void printPID();
 
 
 

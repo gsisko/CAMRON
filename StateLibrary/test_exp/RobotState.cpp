@@ -2,6 +2,8 @@
 #include "RobotState.h"
 
 
+
+
 float* RobotState::checkErase()
 {
   Serial.print((int)controller->checkLoc());
@@ -36,7 +38,7 @@ void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, 
 
 float RobotState::ForceSense() //these funcitions try to attain the goal force and position of the robot, returns error
 {
-        EraserForce = (float)analogRead(0);
+        EraserForce = (float)analogRead(POT);
         controller->operate(&EraserForce, &ScrewSpeed);
 	/*
 	   sumposition += 1;
@@ -52,7 +54,10 @@ float RobotState::ForceSense() //these funcitions try to attain the goal force a
 	 */
 
   //adjust ScrewSpeed, make sure value is bounded in the future
-  //ScrewSpeed = max(0, min(ScrewSpeed, 255)); 
+  
+  
+  ScrewSpeed = max(-90, min(ScrewSpeed, 90)); 
+
   return ScrewSpeed;
 }
 
@@ -73,25 +78,60 @@ void RobotState::setD(float _D)
 void RobotState::setDES(float _desired)
 {controller->desired = _desired;}
 
-#define SUM_SIZE 10
+void RobotState::printPID()
+{
+  SerialD.print(controller->P);
+  SerialD.print("      ");
+  SerialD.print(controller->I);
+  SerialD.print("      ");
+  SerialD.print(controller->D);
+  SerialD.print("      ");
+  SerialD.println(controller->desired);
+  while(!SerialD.available());
+  SerialD.flush();
+}
 
 template <class T>
-class  PIDControl
+PIDControl<T>::PIDControl(T _P,T _I,T _D, T _desired)
 {
-	private:
-		//PID Variables, should really make a PID class
-		T sum;
-		T diff;
-		T sumnation[SUM_SIZE];
-		int sumposition;
+	
+	
+        
+	desired = _desired;
+	P = _P; 
+	I = _I; 
+	D = _D;
+	for(int i=0; i<SUM_SIZE;i++)
+	{
+		sumnation[i] = 0;
+	}
+	sumposition = 0;
+        sum = 0;
+        diff = 0;
+}
 
-	public:
-		T *output;
-		T desired;
-		T P,I,D;
-                PIDControl(T,T,T, T);
-		T operate(T*, T*);
-                T* checkLoc();
-};
+
+template <class T>
+T PIDControl<T>::operate(T *input, T* output)
+{
+	diff = sumnation[sumposition];
+        sumposition += 1;
+	if(sumposition >= SUM_SIZE)
+		sumposition = 0;
+        sumnation[sumposition] = desired - *input;
+        diff = sumnation[sumposition] - diff; 
+	int i = SUM_SIZE;
+        sum = 0;
+        for(i = 0; i < SUM_SIZE; i++)
+          {
+            //Serial.println(sumnation[i]);
+            sum += sumnation[i];
+          }
+        
+        Serial.print(sum);
+        Serial.print("  .   ");
+	return *output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
+        
+}
 
 
