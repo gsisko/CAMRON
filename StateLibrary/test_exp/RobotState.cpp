@@ -129,7 +129,9 @@ T PIDControl<T>::operate(T *input, T* output)
           }
         
         Serial.print(sum);
-        Serial.print("  .   ");
+        Serial.print("...");
+        Serial.print(diff);
+        Serial.print("...    ");
 	return *output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
         
 }

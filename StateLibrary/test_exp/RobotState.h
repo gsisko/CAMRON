@@ -1,8 +1,10 @@
 
 #include <Servo.h>
 //#include "PID.h"
+#define TOGGLEPIN 0
 #define POT 0
 #define LIFTMOTOR 7
+#define WIPERMOTOR 6 
 #define TOPLIMIT 31
 #define BOTTOMLIMIT 32
 #define SerialD Serial
