@@ -7,6 +7,12 @@
 #define WIPERMOTOR 6 
 #define TOPLIMIT 31
 #define BOTTOMLIMIT 32
+#define XENCODER //0
+#define YENCODER //0
+#define XQUAD //0
+#define YQUAD //0
+#define XMOTOR
+#define YMOTOR
 #define SerialD Serial
 #define SUM_SIZE 50 
 #include <arduino.h>
@@ -76,6 +82,7 @@ public:
   void setDES(float);
   float* checkErase();
   void printPID();
+  void printPos();
 
 
 

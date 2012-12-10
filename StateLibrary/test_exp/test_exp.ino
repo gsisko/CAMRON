@@ -1,7 +1,8 @@
 #include <MsTimer2.h>
 #include <Servo.h>
 Servo liftMotor;
-
+int xticks = 0;
+int yticks = 0;
 int outputFreq = 20;
 
 //#include "PID.h"
@@ -14,6 +15,11 @@ RobotState myRobot;
 char state = 'P';
 void setup()
 {
+  pinMode(XENCODER, INPUT);
+  pinMode(YENCODER, INPUT);
+  pinMode(XQUAD, INPUT);
+  pinMode(YQUAD, INPUT);
+  
   pinMode(TOGGLEPIN, OUTPUT);
   digitalWrite(TOGGLEPIN, HIGH);
   pinMode(WIPERMOTOR, OUTPUT);
@@ -26,11 +32,38 @@ void setup()
   SerialD.println("setup");
   SerialD.begin(9600);
   myRobot.Init(0,0,5,0,5,300);
+  attachInterrupt(XENCODER, xisr, CHANGE);
+  attachInterrupt(YENCODER, yisr, CHANGE);
   //MsTimer2::set(outputFreq, handler);
   //MsTimer2::start();
 }
+
+void xisr()
+{
+  if(digitalRead(XQUAD))
+    xticks++;
+  else
+    xticks--;
+}
+
+void yisr()
+{
+  if(digitalRead(YQUAD))
+    yticks++;
+  else
+    yticks--;
+}
+
 void loop() 
 {
+  noInterrupts();
+  myRobot.UpdateX(xticks);
+  myRobot.UpdateY(yticks);
+  xticks = 0;
+  yticks = 0;
+  interrupts();
+  myRobot.printPos();
+  SerialD.print("    ");
   SerialD.print(!digitalRead(TOPLIMIT));
   SerialD.print("     ");
   SerialD.print(!digitalRead(BOTTOMLIMIT));

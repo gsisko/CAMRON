@@ -11,6 +11,15 @@ float* RobotState::checkErase()
   return &EraserForce;
   
 }
+
+void RobotState::UpdateX(int ticks)
+{
+  PosX += ticks;
+}
+void RobotState::UpdateY(int ticks)
+{
+  PosY += ticks;
+}
 //P is initially .42 because this is the estimated 1 to 1 mapping of the input to the output across their respect ranges
 //this estimation is based on that we are mapping 60% of the range of a 10 bit value to an 8 bit value.
 RobotState::RobotState(){}
@@ -89,6 +98,13 @@ void RobotState::printPID()
   SerialD.println(controller->desired);
   while(!SerialD.available());
   SerialD.flush();
+}
+
+void RobotState::printPos()
+{
+  SerialD.print(PosX);
+  SerialD.print(",");
+  SerialD.print(PosY);
 }
 
 template <class T>
