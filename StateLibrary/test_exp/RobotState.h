@@ -7,12 +7,14 @@
 #define WIPERMOTOR 6 
 #define TOPLIMIT 31
 #define BOTTOMLIMIT 32
-#define XENCODER //0
-#define YENCODER //0
-#define XQUAD //0
-#define YQUAD //0
-#define XMOTOR
-#define YMOTOR
+#define XENCODER 0 // HOR A
+#define XQUAD 3 // HOR B
+#define XENCODERPIN 2
+#define YENCODER 5   //VERT A
+#define YQUAD 19 //VERT B
+#define YENCODERPIN 18
+#define XMOTOR 9
+#define YMOTOR 8
 #define SerialD Serial
 #define SUM_SIZE 50 
 #include <arduino.h>
@@ -46,9 +48,7 @@ private:
   //Movement Variables:
   int PosX; 	 //X and Y position on the whiteboard. origin is at starting position, in Encoder ticks
   int PosY;      
-  char SpeedX;
-  char SpeedY;
-
+  
 
 
   //Erasing Variables
@@ -65,7 +65,8 @@ private:
    */
   //There might need to be varibles here that are PID related, however they will probably be static variables in the PID function
 public:
- 
+  int SpeedX;
+  int SpeedY;
   RobotState();
   void Init(int, int, float, float, float, float); //takes the initial position
   void UpdateX(int); //adds buffered Encoder ticks into current position
@@ -74,15 +75,16 @@ public:
   float P,I,D;*/
   int GoalPositionX, GoalPositionY;
   float ForceSense(); //these funcitions try to attain the goal force and position of the robot, returns error
-  int Move();
+  void moveTo();
   void setPID(float, float, float, float);
   void setP(float);
   void setI(float);
   void setD(float);
   void setDES(float);
-  float* checkErase();
   void printPID();
   void printPos();
+  void recenter(); //set origin to current position
+  float* checkErase();
 
 
 

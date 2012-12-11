@@ -49,27 +49,30 @@ float RobotState::ForceSense() //these funcitions try to attain the goal force a
 {
         EraserForce = (float)analogRead(POT);
         controller->operate(&EraserForce, &ScrewSpeed);
-	/*
-	   sumposition += 1;
-	   if(sumposition > SUM_SIZE)
-	   sumposition = 0;
-	   sumnation[sumposition] = GoalForce - EraserForce; 
-	   diff = sumnation[sumposition] - sumnation[((sumposition - 1) < 0) ?SUM_SIZE : (sumposition - 1)];
-	   sum += sumnation[sumposition];
-	   sum -= sumnation[((sumposition+1) < SUM_SIZE)? (sumposition+1) : 0];
-	 
 
-	   float ScrewOut = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
-	 */
-
-  //adjust ScrewSpeed, make sure value is bounded in the future
-  
-  
+  //adjust ScrewSpeed
   ScrewSpeed = max(-90, min(ScrewSpeed, 90)); 
 
   return ScrewSpeed;
 }
-
+void RobotState::moveTo()
+{
+  /*
+  SerialD.println("got to moveto");
+  noInterrupts();
+  Xmovement->operate(&PosX, &SpeedX);
+  Ymovement->operate(&PosY, &SpeedY);
+  interrupts();
+  SerialD.println("got past no interrupts");
+  //*/
+  noInterrupts();
+  SpeedX = GoalPositionX - PosX;
+  SpeedY = GoalPositionY - PosY;
+  interrupts();
+  SpeedX = max(-90, min(-SpeedX, 90)); 
+  SpeedY = max(-90, min(-SpeedY, 90)); 
+  
+}
 void RobotState::setPID(float _P, float _I, float _D, float _desired)
 {
   controller->P = _P;
@@ -99,6 +102,13 @@ void RobotState::printPID()
   while(!SerialD.available());
   SerialD.flush();
 }
+
+void RobotState::recenter()
+{
+  PosX = 0;
+  PosY = 0;
+}
+
 
 void RobotState::printPos()
 {
