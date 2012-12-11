@@ -6,12 +6,32 @@ Servo yMotor;
 int xticks = 0;
 int yticks = 0;
 int outputFreq = 20;
-
+long sinceDebug = 0;
+bool retracted = 0;
 //#include "PID.h"
 #include "RobotState.h"
 
 
 RobotState myRobot;
+
+
+/*
+//this is the map of points that the robot has to go to
+#define WAYPOINTS
+int pathMesh[WAYPOINTS][3] =
+{
+  //format: {X,Y,shouldretract},
+  {,},
+  {,},
+  {,},
+  {,},
+  {,},
+  {,},
+  {,},
+  {,},
+};
+//*/
+
 
 
 char state = '0';
@@ -39,7 +59,7 @@ void setup()
   yMotor.attach(YMOTOR, 1000, 2000);
   SerialD.println("setup");
   SerialD.begin(9600);
-  myRobot.Init(0,0,5,0,0,300);
+  myRobot.Init(0,0,0x00,5,0,0,300);
   attachInterrupt(XENCODER, xisr, RISING);
   attachInterrupt(YENCODER, yisr, RISING);
   //MsTimer2::set(outputFreq, handler);
@@ -74,23 +94,31 @@ void loop()
   yticks = 0;
   interrupts();
   myRobot.printPos();
-  SerialD.print("    ");
-  SerialD.print(-myRobot.SpeedX);
-  SerialD.print(",");
-  SerialD.print(myRobot.SpeedY);
-  SerialD.print("    ");
-  SerialD.print(!digitalRead(TOPLIMIT));
-  SerialD.print("     ");
-  SerialD.print(!digitalRead(BOTTOMLIMIT));
-  SerialD.print("   ");
-  float output = myRobot.ForceSense();
+  
+  float output = (!retracted)?
+  myRobot.ForceSense():
+  myRobot.retractEraser();
   xMotor.write(90+myRobot.SpeedX);
   yMotor.write(90+myRobot.SpeedY);
   myRobot.moveTo();
   liftMotor.write(!digitalRead(TOPLIMIT)? max(90+output, 90) : (!digitalRead(BOTTOMLIMIT)? min(90+output, 90) : 90+output) ); //checks the limit switches here
-  SerialD.print(output);
-  SerialD.print("        ");
-  SerialD.println(analogRead(0));
+  
+  if((millis()-sinceDebug) < 100)
+  {
+    SerialD.print("    ");
+    SerialD.print(-myRobot.SpeedX);
+    SerialD.print(",");
+    SerialD.print(myRobot.SpeedY);
+    SerialD.print("    ");
+    SerialD.print(!digitalRead(TOPLIMIT));
+    SerialD.print("     ");
+    SerialD.print(!digitalRead(BOTTOMLIMIT));
+    SerialD.print("   ");
+    SerialD.print(output);
+    SerialD.print("        ");
+    SerialD.println(analogRead(0));
+    sinceDebug = millis();
+  }//*/
   if(SerialD.available())
   {
     state = SerialD.read();
@@ -149,6 +177,11 @@ void loop()
         myRobot.GoalPositionX = 0;
         myRobot.GoalPositionY = 0;
         state = '0';
+        break;
+      case 'Z':
+        retracted = !retracted;
+        state = '0';
+        break;
       case 'W':
         digitalWrite(WIPERMOTOR, !digitalRead(WIPERMOTOR));
         state = '0';
@@ -167,3 +200,5 @@ void stahp()
   xMotor.write(90);
   yMotor.write(90);
 }
+
+

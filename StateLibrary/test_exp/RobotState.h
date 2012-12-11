@@ -15,7 +15,7 @@
 #define YENCODERPIN 18
 #define XMOTOR 9
 #define YMOTOR 8
-#define SerialD Serial
+#define SerialD Serial2
 #define SUM_SIZE 50 
 #include <arduino.h>
 
@@ -48,8 +48,8 @@ private:
   //Movement Variables:
   int PosX; 	 //X and Y position on the whiteboard. origin is at starting position, in Encoder ticks
   int PosY;      
+  int currentPoint;
   
-
 
   //Erasing Variables
   
@@ -68,7 +68,7 @@ public:
   int SpeedX;
   int SpeedY;
   RobotState();
-  void Init(int, int, float, float, float, float); //takes the initial position
+  void Init(int, int, int*, float, float, float, float); //takes the initial position
   void UpdateX(int); //adds buffered Encoder ticks into current position
   void UpdateY(int);
   /*float GoalForce; //we want the eraser to have, each side of the eraser should be at half this force
@@ -85,7 +85,11 @@ public:
   void printPos();
   void recenter(); //set origin to current position
   float* checkErase();
-
+  float retractEraser();
+  int getPosX();
+  int getPosY();
+  void checkState();
+  
 
 
 };

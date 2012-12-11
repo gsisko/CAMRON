@@ -11,7 +11,14 @@ float* RobotState::checkErase()
   return &EraserForce;
   
 }
-
+int RobotState::getPosX()
+{
+  return PosX;
+}
+int RobotState::getPosY()
+{
+  return PosY;
+}
 void RobotState::UpdateX(int ticks)
 {
   PosX += ticks;
@@ -23,8 +30,9 @@ void RobotState::UpdateY(int ticks)
 //P is initially .42 because this is the estimated 1 to 1 mapping of the input to the output across their respect ranges
 //this estimation is based on that we are mapping 60% of the range of a 10 bit value to an 8 bit value.
 RobotState::RobotState(){}
-void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, float _D = 0, float _desired = 1)
+void RobotState::Init(int initialX, int initialY, int *pathMesh = 0x00, float _P = .42, float _I = 0, float _D = 0, float _desired = 1)
 {
+        currentPoint = 0;
 	PosX = initialX;
 	PosY = initialY;
 	SpeedX = 0;
@@ -32,19 +40,28 @@ void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, 
 	GoalPositionX = 0;
 	GoalPositionY = 0;
 	controller = new PIDControl<float>( _P, _I, _D, _desired);
-        //Serial.println((int)&EraserForce);
-	/*GoalForce = 0;
-	  P = 0; 
-	  I = 0; 
-	  D = 0;
-	  for(int i=0; i<SUM_SIZE;i++)
-	  {
-	  sumnation[i] = 0;
-	  }
-	  sumposition = 0;
-	 */
+        /*
+        //this is the map of points that the robot has to go to
+        #define WAYPOINTS
+        int pathMesh[WAYPOINTS][3] =
+        {
+          //format: {X,Y,shouldretract},
+          {,},
+          {,},
+          {,},
+          {,},
+          {,},
+          {,},
+          {,},
+          {,},
+        };
+        //*/
 }
-
+float RobotState::retractEraser()
+{
+  ScrewSpeed = -90;
+  return ScrewSpeed;
+}
 float RobotState::ForceSense() //these funcitions try to attain the goal force and position of the robot, returns error
 {
         EraserForce = (float)analogRead(POT);
@@ -153,13 +170,23 @@ T PIDControl<T>::operate(T *input, T* output)
             //Serial.println(sumnation[i]);
             sum += sumnation[i];
           }
-        
-        Serial.print(sum);
-        Serial.print("...");
-        Serial.print(diff);
-        Serial.print("...    ");
+        /*
+        SerialD.print(sum);
+        SerialD.print("...");
+        SerialD.print(diff);
+        SerialD.print("...    ");
+        */
 	return *output = (sumnation[sumposition]*P)+(sum*I)-(diff*D);
         
 }
 
-
+void RobotState::checkState()
+{
+  bool inposition = 0;//check if we are in the right position based on GoalPositionX and Y
+  if(inposition)
+  {
+    currentPoint++;
+    
+  }
+  else{}
+}
