@@ -7,30 +7,21 @@ int xticks = 0;
 int yticks = 0;
 int outputFreq = 20;
 long sinceDebug = 0;
-bool retracted = 0;
+int machineState = 0;
+bool exeState = 0;
 //#include "PID.h"
 #include "RobotState.h"
 
-
+bool exeMachine = 0;
 RobotState myRobot;
 
-
-/*
-//this is the map of points that the robot has to go to
-#define WAYPOINTS
+#define WAYPOINTS 3
 int pathMesh[WAYPOINTS][3] =
 {
-  //format: {X,Y,shouldretract},
-  {,},
-  {,},
-  {,},
-  {,},
-  {,},
-  {,},
-  {,},
-  {,},
+  {0,0,1},
+  {0,200,0},
+  {0,-200,0}
 };
-//*/
 
 
 
@@ -57,9 +48,8 @@ void setup()
   liftMotor.attach(LIFTMOTOR, 1000, 2000);
   xMotor.attach(XMOTOR, 1000, 2000);
   yMotor.attach(YMOTOR, 1000, 2000);
-  SerialD.println("setup");
   SerialD.begin(9600);
-  myRobot.Init(0,0,0x00,5,0,0,300);
+  myRobot.Init(0,0,5,0,0,300);
   attachInterrupt(XENCODER, xisr, RISING);
   attachInterrupt(YENCODER, yisr, RISING);
   //MsTimer2::set(outputFreq, handler);
@@ -89,22 +79,34 @@ void loop()
 {
   noInterrupts();
   myRobot.UpdateX(xticks);
-  myRobot.UpdateY(yticks);
+  myRobot.UpdateY(yticks/10);
   xticks = 0;
   yticks = 0;
   interrupts();
-  myRobot.printPos();
   
-  float output = (!retracted)?
+  float output = (!myRobot.retracted)?
   myRobot.ForceSense():
   myRobot.retractEraser();
   xMotor.write(90+myRobot.SpeedX);
   yMotor.write(90+myRobot.SpeedY);
+  if(exeState)
+  {
+    if(myRobot.inPosition()&&(machineState < WAYPOINTS))
+    {
+      machineState++;
+      gotoNext();
+    }
+  }
   myRobot.moveTo();
   liftMotor.write(!digitalRead(TOPLIMIT)? max(90+output, 90) : (!digitalRead(BOTTOMLIMIT)? min(90+output, 90) : 90+output) ); //checks the limit switches here
   
   if((millis()-sinceDebug) < 100)
   {
+    myRobot.printPos();
+    SerialD.print("    ");
+    SerialD.print(myRobot.GoalPositionX);
+    SerialD.print(",");
+    SerialD.print(myRobot.GoalPositionY);
     SerialD.print("    ");
     SerialD.print(-myRobot.SpeedX);
     SerialD.print(",");
@@ -116,7 +118,12 @@ void loop()
     SerialD.print("   ");
     SerialD.print(output);
     SerialD.print("        ");
-    SerialD.println(analogRead(0));
+    SerialD.print(analogRead(0));
+    SerialD.print("   ");
+    SerialD.print(machineState);
+    SerialD.print("   ");
+    SerialD.print(myRobot.inPosition());
+    SerialD.println();
     sinceDebug = millis();
   }//*/
   if(SerialD.available())
@@ -172,6 +179,22 @@ void loop()
         myRobot.GoalPositionY = SerialD.parseInt();
         state = '0';
         break;
+      case 'S':
+        stahp();
+        SerialD.println("\n New State:");
+        while(!SerialD.available());
+        machineState = SerialD.parseInt();
+        machineState = max(0,min(WAYPOINTS -1, machineState));
+        state = '0';
+        break;
+      case 'E':
+        exeState = !exeState;
+        state = '0';
+        break;
+      case 'G':
+        gotoNext();
+        state = '0';
+        break;
       case 'R':
         myRobot.recenter();
         myRobot.GoalPositionX = 0;
@@ -179,13 +202,14 @@ void loop()
         state = '0';
         break;
       case 'Z':
-        retracted = !retracted;
+        myRobot.retracted = !myRobot.retracted;
         state = '0';
         break;
       case 'W':
         digitalWrite(WIPERMOTOR, !digitalRead(WIPERMOTOR));
         state = '0';
     }
+  sinceDebug = millis();
   }
 }
 
@@ -200,5 +224,10 @@ void stahp()
   xMotor.write(90);
   yMotor.write(90);
 }
-
+void gotoNext()
+{
+  myRobot.GoalPositionX = pathMesh[machineState][0];
+  myRobot.GoalPositionY = pathMesh[machineState][1];
+  myRobot.retracted = pathMesh[machineState][2];
+}
 

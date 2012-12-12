@@ -30,9 +30,9 @@ void RobotState::UpdateY(int ticks)
 //P is initially .42 because this is the estimated 1 to 1 mapping of the input to the output across their respect ranges
 //this estimation is based on that we are mapping 60% of the range of a 10 bit value to an 8 bit value.
 RobotState::RobotState(){}
-void RobotState::Init(int initialX, int initialY, int *pathMesh = 0x00, float _P = .42, float _I = 0, float _D = 0, float _desired = 1)
+void RobotState::Init(int initialX, int initialY, float _P = .42, float _I = 0, float _D = 0, float _desired = 1)
 {
-        currentPoint = 0;
+        bool retracted = 0;
 	PosX = initialX;
 	PosY = initialY;
 	SpeedX = 0;
@@ -40,22 +40,6 @@ void RobotState::Init(int initialX, int initialY, int *pathMesh = 0x00, float _P
 	GoalPositionX = 0;
 	GoalPositionY = 0;
 	controller = new PIDControl<float>( _P, _I, _D, _desired);
-        /*
-        //this is the map of points that the robot has to go to
-        #define WAYPOINTS
-        int pathMesh[WAYPOINTS][3] =
-        {
-          //format: {X,Y,shouldretract},
-          {,},
-          {,},
-          {,},
-          {,},
-          {,},
-          {,},
-          {,},
-          {,},
-        };
-        //*/
 }
 float RobotState::retractEraser()
 {
@@ -74,14 +58,7 @@ float RobotState::ForceSense() //these funcitions try to attain the goal force a
 }
 void RobotState::moveTo()
 {
-  /*
-  SerialD.println("got to moveto");
-  noInterrupts();
-  Xmovement->operate(&PosX, &SpeedX);
-  Ymovement->operate(&PosY, &SpeedY);
-  interrupts();
-  SerialD.println("got past no interrupts");
-  //*/
+  
   noInterrupts();
   SpeedX = GoalPositionX - PosX;
   SpeedY = GoalPositionY - PosY;
@@ -180,13 +157,15 @@ T PIDControl<T>::operate(T *input, T* output)
         
 }
 
-void RobotState::checkState()
+
+void RobotState::gotoState(int _goalX, int _goalY, int _ret)
 {
-  bool inposition = 0;//check if we are in the right position based on GoalPositionX and Y
-  if(inposition)
-  {
-    currentPoint++;
-    
-  }
-  else{}
+  GoalPositionX = _goalX;
+  GoalPositionY = _goalY;
+  retracted = _ret;
+}
+
+bool RobotState::inPosition()
+{
+  return (abs(GoalPositionY - PosY) < 70)&&(abs(GoalPositionX - PosX) < 70);
 }
