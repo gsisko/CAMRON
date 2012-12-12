@@ -6,7 +6,8 @@ Servo yMotor;
 int xticks = 0;
 int yticks = 0;
 int outputFreq = 20;
-long sinceDebug = 0;
+long sinceDebug = millis();
+long sinceStateChange = millis();
 int machineState = 0;
 bool exeState = 0;
 //#include "PID.h"
@@ -16,11 +17,12 @@ bool exeMachine = 0;
 RobotState myRobot;
 
 #define WAYPOINTS 3
-int pathMesh[WAYPOINTS][3] =
+int pathMesh[WAYPOINTS][4] =
 {
-  {0,0,1},
-  {0,200,0},
-  {0,-200,0}
+  //format: X coordinate, Y coordinate, rectract, and then time to delay in milliseconds.
+  {0,0,1,7000},
+  {0,200,0,1000},
+  {0,-200,0,1000}
 };
 
 
@@ -93,14 +95,18 @@ void loop()
   {
     if(myRobot.inPosition()&&(machineState < WAYPOINTS))
     {
-      machineState++;
-      gotoNext();
+      if((max(0,(signed long)millis() - sinceStateChange))>pathMesh[machineState][3])
+      {
+        machineState++;
+        gotoNext();
+        sinceStateChange = millis();
+      }
     }
   }
   myRobot.moveTo();
   liftMotor.write(!digitalRead(TOPLIMIT)? max(90+output, 90) : (!digitalRead(BOTTOMLIMIT)? min(90+output, 90) : 90+output) ); //checks the limit switches here
   
-  if((millis()-sinceDebug) < 100)
+  if((millis()-sinceDebug) > 100)
   {
     myRobot.printPos();
     SerialD.print("    ");
@@ -123,8 +129,13 @@ void loop()
     SerialD.print(machineState);
     SerialD.print("   ");
     SerialD.print(myRobot.inPosition());
+    SerialD.print("   ");
+    SerialD.print((millis() - sinceStateChange));
+    SerialD.print("   ");
+    SerialD.print((myRobot.inPosition()&&(machineState < WAYPOINTS))? pathMesh[machineState][3]-(max(0,(signed long)millis() - sinceStateChange)) : pathMesh[machineState][3]);
     SerialD.println();
-    sinceDebug = millis();
+    
+    
   }//*/
   if(SerialD.available())
   {
@@ -189,6 +200,7 @@ void loop()
         break;
       case 'E':
         exeState = !exeState;
+        sinceStateChange = millis();
         state = '0';
         break;
       case 'G':
