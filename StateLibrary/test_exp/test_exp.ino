@@ -16,13 +16,23 @@ bool exeState = 0;
 bool exeMachine = 0;
 RobotState myRobot;
 
-#define WAYPOINTS 3
+#define WAYPOINTS 11
 int pathMesh[WAYPOINTS][4] =
 {
+  
   //format: X coordinate, Y coordinate, rectract, and then time to delay in milliseconds.
   {0,0,1,7000},
-  {0,200,0,1000},
-  {0,-200,0,1000}
+  {450,0,0,5000},
+  {0,0,0,5000},
+  {450,0,0,5000},
+  {0,0,0,5000},
+  {450,0,0,5000},
+  {0,0,0,5000},
+  {450,0,0,5000},
+  {0,0,0,5000},
+  {450,0,0,5000},
+  {0,0,0,5000},
+  
 };
 
 
@@ -51,11 +61,11 @@ void setup()
   xMotor.attach(XMOTOR, 1000, 2000);
   yMotor.attach(YMOTOR, 1000, 2000);
   SerialD.begin(9600);
-  myRobot.Init(0,0,5,0,0,300);
+  myRobot.Init(0,0,2,0,.1,300);
   attachInterrupt(XENCODER, xisr, RISING);
   attachInterrupt(YENCODER, yisr, RISING);
-  //MsTimer2::set(outputFreq, handler);
-  //MsTimer2::start();
+  MsTimer2::set(outputFreq, handler);
+  MsTimer2::start();
 }
 
 void xisr()
@@ -85,22 +95,37 @@ void loop()
   xticks = 0;
   yticks = 0;
   interrupts();
-  
-  float output = (!myRobot.retracted)?
-  myRobot.ForceSense():
-  myRobot.retractEraser();
+  /*
+  float output;
+  if(myRobot.retracted)
+  {
+    output = myRobot.ForceSense();
+  }
+  else
+  {
+    output = myRobot.retractEraser();
+  }
+  //*/
+  float output = myRobot.getScrewSpeed();
   xMotor.write(90+myRobot.SpeedX);
   yMotor.write(90+myRobot.SpeedY);
   if(exeState)
   {
     if(myRobot.inPosition()&&(machineState < WAYPOINTS))
     {
-      if((max(0,(signed long)millis() - sinceStateChange))>pathMesh[machineState][3])
+      if(!max(0,pathMesh[machineState][3]-(max(0,(signed long)millis() - sinceStateChange))))
       {
         machineState++;
         gotoNext();
         sinceStateChange = millis();
       }
+    }
+    else if(machineState >= WAYPOINTS)
+    {
+
+      myRobot.recenter();
+      myRobot.GoalPositionX = 0;
+      myRobot.GoalPositionY = 0;
     }
   }
   myRobot.moveTo();
@@ -198,6 +223,16 @@ void loop()
         machineState = max(0,min(WAYPOINTS -1, machineState));
         state = '0';
         break;
+      case 'N':
+        stahp();
+        SerialD.println("\n New SampleRate:");
+        while(!SerialD.available());
+        outputFreq = SerialD.parseInt();
+        MsTimer2::stop();
+        MsTimer2::set(outputFreq, handler);
+        MsTimer2::start();
+        state = '0';
+        break;
       case 'E':
         exeState = !exeState;
         sinceStateChange = millis();
@@ -228,6 +263,14 @@ void loop()
 void handler()
 {
   digitalWrite(TOGGLEPIN,  !digitalRead(TOGGLEPIN));
+  if(!myRobot.retracted)
+  {
+    myRobot.ForceSense();
+  }
+  else
+  {
+    myRobot.retractEraser();
+  }
 }
 
 void stahp()

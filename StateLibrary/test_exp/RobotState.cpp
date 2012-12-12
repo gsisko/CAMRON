@@ -3,14 +3,14 @@
 
 
 
-
+/*
 float* RobotState::checkErase()
 {
   Serial.print((int)controller->checkLoc());
   Serial.print("      ");
   return &EraserForce;
   
-}
+}*/
 int RobotState::getPosX()
 {
   return PosX;
@@ -63,7 +63,7 @@ void RobotState::moveTo()
   SpeedX = GoalPositionX - PosX;
   SpeedY = GoalPositionY - PosY;
   interrupts();
-  SpeedX = max(-90, min(-SpeedX, 90)); 
+  SpeedX = max(-70, min(-SpeedX, 70)); 
   SpeedY = max(-90, min(-SpeedY, 90)); 
   
 }
@@ -168,4 +168,10 @@ void RobotState::gotoState(int _goalX, int _goalY, int _ret)
 bool RobotState::inPosition()
 {
   return (abs(GoalPositionY - PosY) < 70)&&(abs(GoalPositionX - PosX) < 70);
+}
+float RobotState::getScrewSpeed()
+{
+  noInterrupts();
+  return ScrewSpeed;
+  interrupts();
 }

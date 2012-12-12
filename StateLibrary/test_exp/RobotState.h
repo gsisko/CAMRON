@@ -1,7 +1,7 @@
 
 #include <Servo.h>
 //#include "PID.h"
-#define TOGGLEPIN 0
+#define TOGGLEPIN 13
 #define POT 0
 #define LIFTMOTOR 7
 #define WIPERMOTOR 6 
@@ -91,7 +91,7 @@ public:
   int getPosY();
   void gotoState(int, int, int);
   bool inPosition();
- 
+  float getScrewSpeed();
 
 
 };
