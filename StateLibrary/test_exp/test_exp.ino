@@ -372,13 +372,15 @@ void handler()
 //this is a function that will stop all motors on the robot that are actively controlled by the arduino. 
 //This function is mainly used to prevent over driving while waiting for user input.
 //this function does not stop the wiper becuase over driving the wiper is prevented by an external logic circuit.
-//Robot... wat R u doin? Robot, stahp
+
 void stahp()
 {
 	liftMotor.write(90);
 	xMotor.write(90);
 	yMotor.write(90);
 }
+//Comrin... wat R u doin? Comrin, stahp
+
 //this functon is in charge of setting the current state in the waypoint array as the desired position for the robot.
 void gotoNext()
 {
