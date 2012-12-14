@@ -49,10 +49,7 @@ RobotState myRobot;
  */
 //down: 2670, 4873, 8250,10000
 //const int WAYPOINTS 7
-#define WAYPOINTS 7
-const int pathMesh[WAYPOINTS][4] =
-{
-	/*
+/*
 	//this path wipes back and forth 5 times across a window pain
 	{0,0,1,2000},
 	{450,0,1,0},
@@ -66,7 +63,12 @@ const int pathMesh[WAYPOINTS][4] =
 	{450,0,0,0},
 	{0,0,0,0},
 	//*/
-	//starting from the top left corner, this path will go one pass over the pane and 
+#define WAYPOINTS 7
+const int pathMesh[WAYPOINTS][4] =
+{
+	
+	//starting from the top left corner, this path will 
+        //go one pass over the pane and 
 	//lift itself down from the bottom right corner
 	{0,0,0,0},
 	{450,0,0,0},
