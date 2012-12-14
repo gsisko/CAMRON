@@ -222,7 +222,7 @@ void loop()
 		SerialD.print("   ");
 		SerialD.print(output);
 		SerialD.print("        ");
-		SerialD.print(analogRead(0));
+		SerialD.print(analogRead(POT));
 		SerialD.print("   ");
 		SerialD.print(machineState);
 		SerialD.print("   ");
