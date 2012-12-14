@@ -265,7 +265,7 @@ void loop()
 		state = SerialD.read();
 		switch (state)
 		{
-			case 'P1':
+			case 'P':
 				stahp();
 				SerialD.println("\n New P:");
 				while(!SerialD.available());
